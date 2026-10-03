@@ -1,0 +1,33 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Personal / local-only (not needed to build or run the service)
+vMASTER ENGINEERING PROMPT.md
+SETUP-ENV.md
+.cursor/
+
+# Local git & MCP helper scripts (not part of the runnable service)
+scripts/setup-mcp.ps1
+scripts/first-git-push.ps1
+scripts/merge-to-main.ps1
+docs/
+
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

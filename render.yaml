@@ -1,0 +1,27 @@
+# Render deploys this service from the main branch only.
+# Connect repo in Render Dashboard → New → Blueprint, or link existing web service to branch: main.
+# Set DB_URL / DB_USERNAME / DB_PASSWORD in the Render dashboard (MySQL must be reachable from Render).
+
+services:
+  - type: web
+    name: seat-reservation-api
+    runtime: docker
+    branch: main
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health/live
+    autoDeploy: true
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_POOL_SIZE
+        value: "10"
+      - key: PORT
+        value: "8080"
