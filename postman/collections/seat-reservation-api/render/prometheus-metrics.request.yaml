@@ -1,0 +1,5 @@
+$kind: http-request
+name: Prometheus Metrics
+method: GET
+url: '{{base_url}}/actuator/prometheus'
+order: 3000

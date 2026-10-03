@@ -1,0 +1,7 @@
+$kind: collection
+name: Seat Reservation API
+description: |-
+  Paytm seat reservation assignment. Phase 1 — health and metrics.
+  Use the Local folder for mvn spring-boot:run or docker compose.
+  Use the Render folder for the deployed service on Render.
+order: 1000

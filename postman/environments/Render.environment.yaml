@@ -1,0 +1,7 @@
+name: Render
+values:
+  - key: base_url
+    value: 'https://seat-reservation-api-pyzg.onrender.com'
+    enabled: true
+    type: default
+    description: Live Render deployment (main branch)

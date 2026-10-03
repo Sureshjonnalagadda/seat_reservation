@@ -1,0 +1,7 @@
+$kind: collection
+name: Local
+description: Requests against http://localhost:8080 (mvn spring-boot:run or docker compose on 8080).
+order: 1000
+variables:
+  - key: base_url
+    value: 'http://localhost:8080'

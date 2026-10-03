@@ -1,0 +1,7 @@
+$kind: collection
+name: Render (Deployed)
+description: Requests against the live Render deployment (main branch).
+order: 2000
+variables:
+  - key: base_url
+    value: 'https://seat-reservation-api-pyzg.onrender.com'

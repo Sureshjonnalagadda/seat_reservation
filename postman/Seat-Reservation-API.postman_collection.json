@@ -1,0 +1,306 @@
+{
+  "info": {
+    "_postman_id": "seat-reservation-api-collection",
+    "name": "Seat Reservation API",
+    "description": "Paytm seat reservation assignment. Use **Local** for localhost:8080 and **Render (Deployed)** for the live service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Local",
+      "description": "Run the app locally. Default port 8080.",
+      "item": [
+        {
+          "name": "Auth — Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{local_base_url}}/auth/register"
+          },
+          "response": []
+        },
+        {
+          "name": "Auth — Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{local_base_url}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Auth — Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"adminrole\"\n}"
+            },
+            "url": "{{local_base_url}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Shows — Create (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('show_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mumbai Concert\",\n  \"seats\": [\"A1\", \"A2\", \"A3\", \"A4\"],\n  \"price_paise\": 150000,\n  \"per_user_limit\": 4\n}"
+            },
+            "url": "{{local_base_url}}/shows"
+          },
+          "response": []
+        },
+        {
+          "name": "Shows — Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{local_base_url}}/shows/{{show_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Health — Live",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{local_base_url}}/health/live"
+          },
+          "response": []
+        },
+        {
+          "name": "Health — Ready (DB)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{local_base_url}}/health/ready"
+          },
+          "response": []
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{local_base_url}}/actuator/prometheus"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Render (Deployed)",
+      "description": "Live deployment on Render. First request after idle may take 30–60s.",
+      "item": [
+        {
+          "name": "Auth — Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{render_base_url}}/auth/register"
+          },
+          "response": []
+        },
+        {
+          "name": "Auth — Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{render_base_url}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Auth — Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', json.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"adminrole\"\n}"
+            },
+            "url": "{{render_base_url}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Shows — Create (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('show_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mumbai Concert\",\n  \"seats\": [\"A1\", \"A2\", \"A3\", \"A4\"],\n  \"price_paise\": 150000,\n  \"per_user_limit\": 4\n}"
+            },
+            "url": "{{render_base_url}}/shows"
+          },
+          "response": []
+        },
+        {
+          "name": "Shows — Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{render_base_url}}/shows/{{show_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Health — Live",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{render_base_url}}/health/live"
+          },
+          "response": []
+        },
+        {
+          "name": "Health — Ready (DB)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{render_base_url}}/health/ready"
+          },
+          "response": []
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{render_base_url}}/actuator/prometheus"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "local_base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "render_base_url",
+      "value": "https://seat-reservation-api-pyzg.onrender.com"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "show_id",
+      "value": "1"
+    }
+  ]
+}

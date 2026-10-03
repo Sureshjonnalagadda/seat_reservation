@@ -1,0 +1,4 @@
+app:
+  jwt:
+    secret: test-jwt-secret-for-unit-tests-minimum-32-characters
+    expiration-seconds: 3600

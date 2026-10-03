@@ -35,6 +35,38 @@ After deploy:
 .\scripts\smoke-live.ps1 -BaseUrl "https://YOUR-SERVICE.onrender.com"
 ```
 
+## Postman
+
+Import **`postman/Seat-Reservation-API.postman_collection.json`** (not the `collections/` YAML folder). See [postman/README.md](postman/README.md).
+
+Live base URL: `https://seat-reservation-api-pyzg.onrender.com`
+
+## Auth (Phase 2)
+
+- `POST /auth/register` — `{"username","password"}` (password min 8 chars) → `201` with `user_id`, `username`, `role`
+- `POST /auth/login` — returns `access_token`, `token_type`, `expires_in`
+- Protected routes require `Authorization: Bearer <token>` (JWT includes `sub`, `role`, `uid`)
+
+Set `JWT_SECRET` (min 32 characters) in production.
+
+**Demo admin** (seeded by Flyway `V2__seed_admin_user.sql`): username `admin`, password `adminrole`. Use for `POST /shows` only — not for production.
+
+## Shows (Phase 3)
+
+- `POST /shows` — ADMIN only; creates show + seats in one transaction (`201`)
+- `GET /shows/{id}` — public; per-seat status and derived counts
+
+Example create body:
+
+```json
+{
+  "name": "Mumbai Concert",
+  "seats": ["A1", "A2", "A3", "A4"],
+  "price_paise": 150000,
+  "per_user_limit": 4
+}
+```
+
 ## Status
 
-Phase 1 complete: Flyway schema, health/readiness, Prometheus. Auth and reservation APIs follow on `development`.
+Phase 3 in progress: admin seed + show APIs. Next: reserve/cancel on `development`.
