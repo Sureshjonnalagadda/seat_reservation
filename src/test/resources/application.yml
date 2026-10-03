@@ -1,3 +1,7 @@
+spring:
+  profiles:
+    active: test
+
 app:
   jwt:
     secret: test-jwt-secret-for-unit-tests-minimum-32-characters

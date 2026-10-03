@@ -1,6 +1,7 @@
 package com.paytm.reservation.common.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 
@@ -10,6 +11,6 @@ public record ApiErrorResponse(
         int status,
         String code,
         String message,
-        String requestId
+        @JsonProperty("request_id") String requestId
 ) {
 }

@@ -1,6 +1,7 @@
 package com.paytm.reservation.show;
 
 import com.paytm.reservation.common.exception.DuplicateSeatNumbersException;
+import com.paytm.reservation.common.observability.ReservationMetrics;
 import com.paytm.reservation.common.exception.ShowNotFoundException;
 import com.paytm.reservation.show.dto.CreateShowRequest;
 import com.paytm.reservation.show.dto.CreateShowResponse;
@@ -29,6 +30,9 @@ class ShowServiceTest {
 
     @Mock
     private SeatRepository seatRepository;
+
+    @Mock
+    private ReservationMetrics reservationMetrics;
 
     @InjectMocks
     private ShowService showService;

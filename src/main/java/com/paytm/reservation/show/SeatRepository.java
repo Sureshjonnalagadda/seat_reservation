@@ -25,6 +25,15 @@ public class SeatRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public int countAvailableSeats(long showId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM seats WHERE show_id = ? AND status = 'AVAILABLE'",
+                Integer.class,
+                showId
+        );
+        return count == null ? 0 : count;
+    }
+
     public List<Seat> findByShowIdOrderBySeatNumber(long showId) {
         return jdbcTemplate.query(
                 """

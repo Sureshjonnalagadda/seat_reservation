@@ -14,7 +14,10 @@
           "name": "Auth — Register",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Request-ID", "value": "{{$guid}}"}
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"
@@ -206,7 +209,10 @@
           "name": "Auth — Register",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Request-ID", "value": "{{$guid}}"}
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"password123\"\n}"

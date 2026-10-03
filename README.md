@@ -82,6 +82,18 @@ Reserve body (no `user_id`):
 }
 ```
 
+## Observability (Phase 5)
+
+- Every JSON API response includes `request_id` in the body and `X-Request-ID` on the response header (client may send the header; otherwise a UUID is generated). Actuator/Prometheus paths are unchanged.
+- JSON structured logs (Logstash encoder) in non-test profiles; MDC fields include `request_id`, `event`, `show_id`, etc.
+- Prometheus: `reservations_confirmed_total`, `reservations_declined_total{reason=...}`, `seats_available{show_id=...}` at `GET /actuator/prometheus`
+
+Optional header on any request:
+
+```http
+X-Request-ID: my-trace-id
+```
+
 ## Status
 
-Phase 4: reserve, get, and cancel with JDBC locking and idempotency. Next: observability and burst testing on `development`.
+Phase 5: request IDs, structured logs, and reservation metrics. Next: burst test script and WRITEUP on `development`.

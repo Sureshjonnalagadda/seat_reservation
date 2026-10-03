@@ -2,6 +2,7 @@ package com.paytm.reservation.show;
 
 import com.paytm.reservation.common.exception.DuplicateSeatNumbersException;
 import com.paytm.reservation.common.exception.ShowNotFoundException;
+import com.paytm.reservation.common.observability.ReservationMetrics;
 import com.paytm.reservation.show.dto.CreateShowRequest;
 import com.paytm.reservation.show.dto.CreateShowResponse;
 import com.paytm.reservation.show.dto.SeatCountsResponse;
@@ -20,10 +21,16 @@ public class ShowService {
 
     private final ShowRepository showRepository;
     private final SeatRepository seatRepository;
+    private final ReservationMetrics reservationMetrics;
 
-    public ShowService(ShowRepository showRepository, SeatRepository seatRepository) {
+    public ShowService(
+            ShowRepository showRepository,
+            SeatRepository seatRepository,
+            ReservationMetrics reservationMetrics
+    ) {
         this.showRepository = showRepository;
         this.seatRepository = seatRepository;
+        this.reservationMetrics = reservationMetrics;
     }
 
     @Transactional
@@ -36,6 +43,7 @@ public class ShowService {
                 seatNumbers.size()
         );
         seatRepository.insertAll(show.id(), seatNumbers);
+        reservationMetrics.updateSeatsAvailable(show.id(), seatNumbers.size());
         return new CreateShowResponse(
                 show.id(),
                 show.name(),
@@ -61,6 +69,7 @@ public class ShowService {
             }
             seatResponses.add(new SeatStatusResponse(seat.seatNumber(), seat.status()));
         }
+        reservationMetrics.updateSeatsAvailable(showId, available);
         return new ShowDetailResponse(
                 show.id(),
                 show.name(),

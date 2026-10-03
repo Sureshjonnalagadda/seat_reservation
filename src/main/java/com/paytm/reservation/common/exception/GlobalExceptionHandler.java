@@ -1,5 +1,6 @@
 package com.paytm.reservation.common.exception;
 
+import com.paytm.reservation.common.web.RequestIdSupport;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -102,7 +103,7 @@ public class GlobalExceptionHandler {
             String message,
             HttpServletRequest request
     ) {
-        String requestId = request.getHeader("X-Request-ID");
+        String requestId = RequestIdSupport.resolve(request);
         ApiErrorResponse body = new ApiErrorResponse(Instant.now(), status.value(), code, message, requestId);
         return ResponseEntity.status(status).body(body);
     }
