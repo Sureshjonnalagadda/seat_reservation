@@ -40,6 +40,54 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Access denied", request);
     }
 
+    @ExceptionHandler(MissingIdempotencyKeyException.class)
+    ResponseEntity<ApiErrorResponse> missingIdempotencyKey(MissingIdempotencyKeyException ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(IdempotencyKeyConflictException.class)
+    ResponseEntity<ApiErrorResponse> idempotencyKeyConflict(IdempotencyKeyConflictException ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(IdempotencyKeyReusedException.class)
+    ResponseEntity<ApiErrorResponse> idempotencyKeyReused(IdempotencyKeyReusedException ex, HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, "IDEMPOTENCY_KEY_REUSED", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(SeatTakenException.class)
+    ResponseEntity<ApiErrorResponse> seatTaken(SeatTakenException ex, HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, "SEAT_TAKEN", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(PerUserLimitExceededException.class)
+    ResponseEntity<ApiErrorResponse> perUserLimit(PerUserLimitExceededException ex, HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, "PER_USER_LIMIT_EXCEEDED", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidSeatSelectionException.class)
+    ResponseEntity<ApiErrorResponse> invalidSeatSelection(InvalidSeatSelectionException ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    ResponseEntity<ApiErrorResponse> reservationNotFound(ReservationNotFoundException ex, HttpServletRequest request) {
+        return error(HttpStatus.NOT_FOUND, "RESERVATION_NOT_FOUND", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ReservationAccessDeniedException.class)
+    ResponseEntity<ApiErrorResponse> reservationAccessDenied(ReservationAccessDeniedException ex, HttpServletRequest request) {
+        return error(HttpStatus.FORBIDDEN, "ACCESS_DENIED", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ReservationAlreadyCancelledException.class)
+    ResponseEntity<ApiErrorResponse> reservationAlreadyCancelled(
+            ReservationAlreadyCancelledException ex,
+            HttpServletRequest request
+    ) {
+        return error(HttpStatus.CONFLICT, "RESERVATION_ALREADY_CANCELLED", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiErrorResponse> validation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String message = ex.getBindingResult().getFieldErrors().stream()

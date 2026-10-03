@@ -117,6 +117,59 @@
           "response": []
         },
         {
+          "name": "Reservations — Reserve Seats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('reservation_id', json.reservation_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"},
+              {"key": "Idempotency-Key", "value": "{{idempotency_key}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seats\": [\"A1\", \"A2\"]\n}"
+            },
+            "url": "{{local_base_url}}/shows/{{show_id}}/reserve"
+          },
+          "response": []
+        },
+        {
+          "name": "Reservations — Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": "{{local_base_url}}/reservations/{{reservation_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Reservations — Cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": "{{local_base_url}}/reservations/{{reservation_id}}/cancel"
+          },
+          "response": []
+        },
+        {
           "name": "Health — Live",
           "request": {
             "method": "GET",
@@ -256,6 +309,59 @@
           "response": []
         },
         {
+          "name": "Reservations — Reserve Seats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('reservation_id', json.reservation_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{access_token}}"},
+              {"key": "Idempotency-Key", "value": "{{idempotency_key}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seats\": [\"A1\", \"A2\"]\n}"
+            },
+            "url": "{{render_base_url}}/shows/{{show_id}}/reserve"
+          },
+          "response": []
+        },
+        {
+          "name": "Reservations — Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": "{{render_base_url}}/reservations/{{reservation_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Reservations — Cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": "{{render_base_url}}/reservations/{{reservation_id}}/cancel"
+          },
+          "response": []
+        },
+        {
           "name": "Health — Live",
           "request": {
             "method": "GET",
@@ -301,6 +407,14 @@
     {
       "key": "show_id",
       "value": "1"
+    },
+    {
+      "key": "reservation_id",
+      "value": ""
+    },
+    {
+      "key": "idempotency_key",
+      "value": "550e8400-e29b-41d4-a716-446655440000"
     }
   ]
 }

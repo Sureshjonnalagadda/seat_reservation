@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -34,6 +35,71 @@ public class SeatRepository {
                 """,
                 ROW_MAPPER,
                 showId
+        );
+    }
+
+    public List<Seat> lockSeatsForUpdate(long showId, List<String> sortedSeatNumbers) {
+        if (sortedSeatNumbers.isEmpty()) {
+            return List.of();
+        }
+        String placeholders = String.join(",", sortedSeatNumbers.stream().map(s -> "?").toList());
+        String sql = """
+                SELECT id, show_id, seat_number, status
+                FROM seats
+                WHERE show_id = ? AND seat_number IN (%s)
+                ORDER BY seat_number
+                FOR UPDATE
+                """.formatted(placeholders);
+        List<Object> args = new ArrayList<>(sortedSeatNumbers.size() + 1);
+        args.add(showId);
+        args.addAll(sortedSeatNumbers);
+        return jdbcTemplate.query(sql, ROW_MAPPER, args.toArray());
+    }
+
+    public void confirmSeats(List<Long> seatIds) {
+        if (seatIds.isEmpty()) {
+            return;
+        }
+        jdbcTemplate.batchUpdate(
+                """
+                UPDATE seats
+                SET status = 'CONFIRMED', version = version + 1, updated_at = CURRENT_TIMESTAMP(6)
+                WHERE id = ?
+                """,
+                seatIds,
+                seatIds.size(),
+                (ps, seatId) -> ps.setLong(1, seatId)
+        );
+    }
+
+    public void releaseSeats(List<Long> seatIds) {
+        if (seatIds.isEmpty()) {
+            return;
+        }
+        jdbcTemplate.batchUpdate(
+                """
+                UPDATE seats
+                SET status = 'AVAILABLE', version = version + 1, updated_at = CURRENT_TIMESTAMP(6)
+                WHERE id = ?
+                """,
+                seatIds,
+                seatIds.size(),
+                (ps, seatId) -> ps.setLong(1, seatId)
+        );
+    }
+
+    public List<Seat> lockSeatsForReservationForUpdate(String reservationId) {
+        return jdbcTemplate.query(
+                """
+                SELECT s.id, s.show_id, s.seat_number, s.status
+                FROM seats s
+                INNER JOIN reservation_seats rs ON rs.seat_id = s.id
+                WHERE rs.reservation_id = ?
+                ORDER BY s.seat_number
+                FOR UPDATE
+                """,
+                ROW_MAPPER,
+                reservationId
         );
     }
 

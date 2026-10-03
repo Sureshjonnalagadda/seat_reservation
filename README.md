@@ -67,6 +67,21 @@ Example create body:
 }
 ```
 
+## Reservations (Phase 4)
+
+- `POST /shows/{id}/reserve` — authenticated; `Idempotency-Key` header or body `idempotency_key` (header wins; both must match if present)
+- `GET /reservations/{id}` — owner or ADMIN
+- `POST /reservations/{id}/cancel` — owner or ADMIN
+
+Reserve body (no `user_id`):
+
+```json
+{
+  "seats": ["A1", "A2"],
+  "idempotency_key": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
 ## Status
 
-Phase 3 in progress: admin seed + show APIs. Next: reserve/cancel on `development`.
+Phase 4: reserve, get, and cancel with JDBC locking and idempotency. Next: observability and burst testing on `development`.
