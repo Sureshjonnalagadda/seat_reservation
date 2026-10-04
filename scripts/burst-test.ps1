@@ -86,13 +86,29 @@ Write-Host ""
 Write-Host "Final Seat State:"
 Write-Host "$Seat = $finalStatus"
 Write-Host ""
+Write-Host "Reconciliation (GET /shows/$showId):"
+$avail = $showState.counts.available
+$held = $showState.counts.held
+$confirmed = $showState.counts.confirmed
+$total = $showState.total_seats
+$sum = $avail + $held + $confirmed
+Write-Host "  available=$avail  held=$held  confirmed=$confirmed  total_seats=$total"
+Write-Host "  available + held + confirmed = $sum"
+if ($sum -eq $total) {
+    Write-Host "  invariant: OK"
+} else {
+    Write-Host "  invariant: FAIL (expected $total)"
+}
+Write-Host ""
 
+$reconcileOk = ($sum -eq $total)
 $pass = (
     $created -eq 1 -and
     $serverErrors -eq 0 -and
     $other -eq 0 -and
     ($created + $replay + $conflict) -eq $Requests -and
-    $finalStatus -eq "CONFIRMED"
+    $finalStatus -eq "CONFIRMED" -and
+    $reconcileOk
 )
 if ($pass) {
     Write-Host "Result:"

@@ -75,7 +75,17 @@ while read -r code; do
 done <"$tmpdir/codes"
 
 SHOW_JSON="$(curl -s "$BASE_URL/shows/$SHOW_ID")"
-FINAL_STATUS="$(python3 -c "import json,sys; data=json.load(sys.stdin); print(next(s['status'] for s in data['seats'] if s['seat_number']=='$SEAT'))" <<<"$SHOW_JSON")"
+read -r FINAL_STATUS AVAIL HELD CONFIRMED TOTAL SUM <<<"$(python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+c=data['counts']
+avail=c['available']
+held=c['held']
+conf=c['confirmed']
+total=data['total_seats']
+seat=next(s['status'] for s in data['seats'] if s['seat_number']=='$SEAT')
+print(seat, avail, held, conf, total, avail+held+conf)
+" <<<"$SHOW_JSON")"
 
 echo "========================================"
 echo " Seat Reservation Concurrency Test"
@@ -94,9 +104,18 @@ echo
 echo "Final Seat State:"
 echo "$SEAT = $FINAL_STATUS"
 echo
+echo "Reconciliation (GET /shows/$SHOW_ID):"
+echo "  available=$AVAIL  held=$HELD  confirmed=$CONFIRMED  total_seats=$TOTAL"
+echo "  available + held + confirmed = $SUM"
+if [[ "$SUM" -eq "$TOTAL" ]]; then
+  echo "  invariant: OK"
+else
+  echo "  invariant: FAIL (expected $TOTAL)"
+fi
+echo
 
 PASS=true
-if [[ "$CREATED" -ne 1 || "$SERVER_ERRORS" -ne 0 || "$OTHER" -ne 0 || "$FINAL_STATUS" != "CONFIRMED" ]]; then
+if [[ "$CREATED" -ne 1 || "$SERVER_ERRORS" -ne 0 || "$OTHER" -ne 0 || "$FINAL_STATUS" != "CONFIRMED" || "$SUM" -ne "$TOTAL" ]]; then
   PASS=false
 fi
 if [[ "$((CREATED + REPLAY + CONFLICT))" -ne "$REQUESTS" ]]; then

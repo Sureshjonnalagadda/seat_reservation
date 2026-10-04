@@ -47,9 +47,14 @@ Table `show_user_booking` holds `(show_id, user_id) → active_seat_count`. It i
 
 Header `Idempotency-Key` wins over body `idempotency_key` when both are present; mismatched values → **400**.
 
-## 8. Cancellation
+## 8. Holds, expiry, and cancellation
 
-Transactional flow: lock `show_user_booking`, lock reservation, verify owner and `CONFIRMED`, lock seats in order, set seats `AVAILABLE`, delete `reservation_seats`, decrement `active_seat_count`, mark reservation `CANCELLED` with `cancelled_at`.
+**Model chosen:** explicit **`POST /reservations/{id}/cancel`** — not time-boxed holds.
+
+- On successful reserve, seats move **`AVAILABLE` → `CONFIRMED`** in the same transaction (no intermediate `HELD` state in the write path).
+- The schema allows `HELD` for future work; this submission does not implement TTL expiry or background jobs to release holds.
+- **Cancel** (owner or admin, transactional): lock `show_user_booking`, lock reservation, verify `CONFIRMED`, lock seats in order, set seats **`AVAILABLE`**, delete `reservation_seats`, decrement `active_seat_count`, mark reservation **`CANCELLED`** with `cancelled_at`.
+- A cancelled seat is immediately re-bookable; cancel never revives inventory already sold to another user because seat rows are locked and status-checked in the same transaction.
 
 ## 9. Consistency vs availability
 
@@ -61,6 +66,17 @@ Reservation **writes** require MySQL. If the database is unavailable, **readines
 - **Structured JSON logs** (Logstash encoder) with events such as `RESERVATION_CONFIRMED`, `SEAT_CONFLICT`, `IDEMPOTENT_REPLAY`.
 - **Metrics**: `reservations_confirmed_total`, `reservations_declined_total{reason=…}`, `seats_available{show_id=…}` at `/actuator/prometheus`.
 - **Health**: `/health/live` (process up), `/health/ready` (DB ping).
+- **Deployed logs:** Render service logs (JSON); correlate via `request_id` / `X-Request-ID`.
+
+### What would page at 2am
+
+| Signal | Why it matters |
+|--------|----------------|
+| `/health/ready` **503** sustained | DB down or pool exhausted — all writes fail; fix dependency first. |
+| Any **5xx** rate on `POST …/reserve` during a sale | Correctness bar violation; check DB locks, connection limits, unhandled exceptions. |
+| `reservations_declined_total{reason=seat_taken}` spike with **zero** `reservations_confirmed_total` | Possible misconfiguration or inventory bug (all declines, no wins). |
+| `seats_available{show_id=X}` stuck at **0** while show should have inventory | Reconciliation drift or mass confirm; compare `GET /shows/{id}` counts. |
+| Latency p99 on reserve >> baseline on free-tier host | Expected under extreme burst; scale DB/API or add admission control (future work). |
 
 ## 11. Database constraints
 

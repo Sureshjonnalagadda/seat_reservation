@@ -1,41 +1,38 @@
 # Postman — Seat Reservation API
 
-## Import into Postman (desktop / web) — use these files
-
-Postman **Import** does **not** accept the `collections/seat-reservation-api/` YAML folder tree. That layout is for **Postman CLI** git-native workflows.
-
-**Do this instead:**
+## Import (reviewers)
 
 1. Postman → **Import** → **Upload Files**
-2. Select:
-   - `postman/Seat-Reservation-API.postman_collection.json`
-3. Optional (same Import flow):
+2. Select **`postman/Seat-Reservation-API.postman_collection.json`**
+3. Optional environments:
    - `postman/Local.postman_environment.json`
    - `postman/Render.postman_environment.json`
 
-You should see collection **Seat Reservation API** with two folders:
+## Folders
 
-| Folder | Variable | Default target |
-|--------|----------|----------------|
+| Folder | Base URL variable | Default |
+|--------|-------------------|---------|
 | **Local** | `{{local_base_url}}` | `http://localhost:8080` |
 | **Render (Deployed)** | `{{render_base_url}}` | `https://seat-reservation-api-pyzg.onrender.com` |
 
-Collection variables are set on the collection; environments duplicate them if you import env files.
+## Included requests
 
-## Requests (Phase 1)
+- Auth: register, login (user + admin)
+- Shows: create (admin), get by id
+- Reservations: reserve (with idempotency), get, cancel
+- Health: live, ready
+- Metrics: Prometheus
 
-- Health — Live → `GET /health/live`
-- Health — Ready (DB) → `GET /health/ready`
-- Prometheus Metrics → `GET /actuator/prometheus`
+**Typical flow:** Admin Login → Create Show → User Login → Reserve → Get Show (verify seat status).
 
-## Git-native v3 tree (optional)
+## Burst / load testing
 
-`postman/collections/seat-reservation-api/` and `postman/environments/*.environment.yaml` are v3 filesystem format for `postman` CLI (`collection lint`, workspace sync). Keep them in git for agents/CLI; use the `.postman_collection.json` for manual Import.
+Not in Postman — use the repo scripts (see root [README.md](../README.md)):
 
-## Phase 2–5 (collection)
+```powershell
+.\scripts\burst-test.ps1 -BaseUrl "https://seat-reservation-api-pyzg.onrender.com"
+```
 
-The JSON collection includes auth, admin show create, reserve/get/cancel, health, and Prometheus under **Local** and **Render (Deployed)**.
+## Optional: v3 YAML tree
 
-## Phase 6 — burst concurrency
-
-Hot-seat load is not a Postman request; use `scripts/burst-test.ps1` or `scripts/burst-test.sh` against a running API. See [WRITEUP.md](../WRITEUP.md) and README **Concurrency testing**.
+`postman/collections/seat-reservation-api/` is for **Postman CLI** only. Manual import uses the **`.postman_collection.json`** file above.
