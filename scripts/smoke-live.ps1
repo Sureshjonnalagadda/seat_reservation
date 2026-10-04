@@ -4,7 +4,7 @@ param(
 )
 
 $BaseUrl = $BaseUrl.TrimEnd("/")
-$failed = 0
+$script:failed = 0
 
 function Test-Endpoint($path, $expectStatus) {
     $url = "$BaseUrl$path"
@@ -15,15 +15,18 @@ function Test-Endpoint($path, $expectStatus) {
             Write-Host "PASS $path -> $code"
         } else {
             Write-Host "FAIL $path -> $code (expected $expectStatus)"
-            $failed++
+            $script:failed++
         }
     } catch {
-        $code = $_.Exception.Response.StatusCode.value__
+        $code = $null
+        if ($_.Exception.Response) {
+            $code = [int]$_.Exception.Response.StatusCode.value__
+        }
         if ($code -eq $expectStatus) {
             Write-Host "PASS $path -> $code"
         } else {
             Write-Host "FAIL $path -> $code / $($_.Exception.Message)"
-            $failed++
+            $script:failed++
         }
     }
 }
@@ -36,9 +39,9 @@ Test-Endpoint "/health/ready" 200
 Test-Endpoint "/actuator/prometheus" 200
 
 Write-Host "========================================"
-if ($failed -eq 0) {
+if ($script:failed -eq 0) {
     Write-Host "Result: PASS"
     exit 0
 }
-Write-Host "Result: FAIL ($failed checks)"
+Write-Host "Result: FAIL ($script:failed checks)"
 exit 1

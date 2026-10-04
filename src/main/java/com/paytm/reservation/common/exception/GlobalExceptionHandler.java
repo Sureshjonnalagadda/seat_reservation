@@ -2,6 +2,8 @@ package com.paytm.reservation.common.exception;
 
 import com.paytm.reservation.common.web.RequestIdSupport;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -59,6 +61,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SeatTakenException.class)
     ResponseEntity<ApiErrorResponse> seatTaken(SeatTakenException ex, HttpServletRequest request) {
         return error(HttpStatus.CONFLICT, "SEAT_TAKEN", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler({CannotAcquireLockException.class, DeadlockLoserDataAccessException.class})
+    ResponseEntity<ApiErrorResponse> concurrencyConflict(RuntimeException ex, HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, "SEAT_TAKEN", "Seat could not be reserved; try again", request);
     }
 
     @ExceptionHandler(PerUserLimitExceededException.class)

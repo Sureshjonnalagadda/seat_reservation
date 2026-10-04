@@ -1,6 +1,14 @@
 spring:
   profiles:
     active: test
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+
+server:
+  tomcat:
+    threads:
+      max: 200
 
 app:
   jwt:

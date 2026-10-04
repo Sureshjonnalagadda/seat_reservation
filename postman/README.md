@@ -32,6 +32,10 @@ Collection variables are set on the collection; environments duplicate them if y
 
 `postman/collections/seat-reservation-api/` and `postman/environments/*.environment.yaml` are v3 filesystem format for `postman` CLI (`collection lint`, workspace sync). Keep them in git for agents/CLI; use the `.postman_collection.json` for manual Import.
 
-## Phase 2+
+## Phase 2–5 (collection)
 
-Add auth, shows, and reserve requests under both **Local** and **Render** folders in the JSON collection (and mirror in v3 YAML if you use CLI).
+The JSON collection includes auth, admin show create, reserve/get/cancel, health, and Prometheus under **Local** and **Render (Deployed)**.
+
+## Phase 6 — burst concurrency
+
+Hot-seat load is not a Postman request; use `scripts/burst-test.ps1` or `scripts/burst-test.sh` against a running API. See [WRITEUP.md](../WRITEUP.md) and README **Concurrency testing**.

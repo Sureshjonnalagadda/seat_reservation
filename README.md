@@ -4,11 +4,18 @@ Backend API for the Paytm take-home exercise: assigned-seat reservations under c
 
 ## Quick start (local)
 
-**Prerequisites:** JDK 17, local MySQL 8 (`seat_reservation` database), Maven.
+**Prerequisites:** JDK 17, local MySQL 8 (`seat_reservation` database). Maven is **not** required on PATH — use the **Maven Wrapper** (`mvnw.cmd`).
 
 ```powershell
-mvn clean test
-mvn spring-boot:run
+.\mvnw.cmd clean test
+.\mvnw.cmd spring-boot:run
+```
+
+Or via helper script:
+
+```powershell
+.\scripts\mvn.ps1 clean test
+.\scripts\mvn.ps1 spring-boot:run
 ```
 
 - Liveness: `GET http://localhost:8080/health/live`
@@ -94,6 +101,42 @@ Optional header on any request:
 X-Request-ID: my-trace-id
 ```
 
+## Concurrency testing (Phase 6)
+
+**Integration tests** (Testcontainers MySQL + full Spring context) live in `ReservationConcurrencyIT`. Requires **Docker Desktop** and JDK 17 + Maven on the host (recommended):
+
+```powershell
+.\mvnw.cmd clean test
+```
+
+Unit tests only (no Docker):
+
+```powershell
+.\scripts\run-mvn-tests.ps1 -SkipIntegrationTests
+```
+
+Full suite including Testcontainers ITs (**Docker Desktop must be running**):
+
+```powershell
+.\scripts\run-mvn-tests.ps1
+```
+
+If you run Maven inside a Docker container, mount the Docker socket and set `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal` (and optionally `TESTCONTAINERS_RYUK_DISABLED=true` on constrained setups).
+
+**Burst script** against a running API (default `http://localhost:8080`):
+
+```powershell
+.\scripts\burst-test.ps1 -Requests 100 -Seat A12
+```
+
+```bash
+BASE_URL=http://localhost:8080 REQUESTS=100 ./scripts/burst-test.sh
+```
+
+Expect exactly one `201 Created`, the rest `409 Conflict`, final seat `CONFIRMED`, zero `5xx`.
+
+Engineering notes: [WRITEUP.md](WRITEUP.md).
+
 ## Status
 
-Phase 5: request IDs, structured logs, and reservation metrics. Next: burst test script and WRITEUP on `development`.
+Phase 6: concurrency integration tests, burst scripts, and WRITEUP. Phases 2–5: auth, shows, reservations, observability.

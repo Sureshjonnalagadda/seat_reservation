@@ -3,6 +3,7 @@ package com.paytm.reservation.common.security;
 import com.paytm.reservation.user.Role;
 import com.paytm.reservation.user.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,12 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
+    private final JwtParser jwtParser;
 
     public JwtService(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
     }
 
     public String generateAccessToken(User user) {
@@ -37,11 +40,7 @@ public class JwtService {
     }
 
     public AuthenticatedUser parseToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
 
         String subject = claims.getSubject();
         String roleName = claims.get("role", String.class);

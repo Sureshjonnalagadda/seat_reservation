@@ -14,6 +14,7 @@ import com.paytm.reservation.show.SeatRepository;
 import com.paytm.reservation.show.Show;
 import com.paytm.reservation.show.ShowRepository;
 import com.paytm.reservation.user.Role;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +84,10 @@ public class ReservationService {
                 reservationEventLogger.idempotencyConflict(showId, userId, normalizedSeats);
                 throw reused;
             }
+        } catch (CannotAcquireLockException ex) {
+            reservationMetrics.recordDeclined("seat_taken");
+            reservationEventLogger.reservationDeclined(showId, userId, normalizedSeats, "SEAT_CONFLICT");
+            throw new SeatTakenException();
         } catch (SeatTakenException ex) {
             reservationMetrics.recordDeclined("seat_taken");
             reservationEventLogger.reservationDeclined(showId, userId, normalizedSeats, "SEAT_CONFLICT");
